@@ -72,9 +72,28 @@ def get_post(url_or_id: str) -> dict:
 
 
 @mcp.tool()
-def search_reddit(query: str, subreddit: Optional[str] = None, limit: int = 10) -> list[dict]:
-    """Search Reddit. Restrict to one subreddit by passing subreddit; otherwise searches r/all."""
-    return reddit_ops.search(reddit_client(), query, subreddit=subreddit, limit=limit)
+def search_reddit(
+    query: str,
+    subreddit: Optional[str] = None,
+    limit: int = 10,
+    sort: str = "relevance",
+    time_filter: str = "all",
+) -> list[dict]:
+    """Search Reddit. Restrict to one subreddit by passing subreddit; otherwise searches r/all.
+
+    For style-matching ("show me top recent posts on topic X in r/Y"), use
+    sort='top' and time_filter='month' (or 'week' for fresher).
+
+    Args:
+        query: Search query.
+        subreddit: Limit search to this subreddit. Default: r/all.
+        limit: Max results, 1-100.
+        sort: One of relevance|hot|top|new|comments.
+        time_filter: One of all|year|month|week|day|hour. Used by sort='top' and 'controversial'.
+    """
+    return reddit_ops.search(
+        reddit_client(), query, subreddit=subreddit, limit=limit, sort=sort, time_filter=time_filter,
+    )
 
 
 def main() -> None:

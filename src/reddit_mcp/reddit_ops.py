@@ -143,10 +143,30 @@ def get_post(reddit: praw.Reddit, url_or_id: str) -> dict:
     }
 
 
-def search(reddit: praw.Reddit, query: str, *, subreddit: Optional[str] = None, limit: int = 10) -> list[dict]:
+SORT_CHOICES = ("relevance", "hot", "top", "new", "comments")
+TIME_FILTER_CHOICES = ("all", "year", "month", "week", "day", "hour")
+
+
+def search(
+    reddit: praw.Reddit,
+    query: str,
+    *,
+    subreddit: Optional[str] = None,
+    limit: int = 10,
+    sort: str = "relevance",
+    time_filter: str = "all",
+) -> list[dict]:
+    """Search Reddit. For 'study the top recent posts on topic X', use sort='top', time_filter='month'.
+
+    Reddit's API does not expose view counts via PRAW (mod-only); 'top' ranks by score.
+    """
+    if sort not in SORT_CHOICES:
+        raise ValueError(f"sort must be one of {SORT_CHOICES}")
+    if time_filter not in TIME_FILTER_CHOICES:
+        raise ValueError(f"time_filter must be one of {TIME_FILTER_CHOICES}")
     target = reddit.subreddit(subreddit) if subreddit else reddit.subreddit("all")
     out = []
-    for s in target.search(query, limit=limit):
+    for s in target.search(query, sort=sort, time_filter=time_filter, limit=limit):
         out.append({
             "id": s.id,
             "title": s.title,
@@ -154,5 +174,7 @@ def search(reddit: praw.Reddit, query: str, *, subreddit: Optional[str] = None, 
             "score": s.score,
             "num_comments": s.num_comments,
             "url": f"https://www.reddit.com{s.permalink}",
+            "selftext": (s.selftext or "")[:1000],
+            "is_self": s.is_self,
         })
     return out

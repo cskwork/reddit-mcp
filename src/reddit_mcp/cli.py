@@ -46,6 +46,18 @@ def main(argv: list[str] | None = None) -> int:
     p_del = sub.add_parser("delete", help="Delete one of your own posts.")
     p_del.add_argument("url_or_id")
 
+    p_search = sub.add_parser(
+        "search",
+        help="Search posts. For style-matching, use --sort top --time-filter month.",
+    )
+    p_search.add_argument("query")
+    p_search.add_argument("--subreddit")
+    p_search.add_argument("--limit", type=int, default=10)
+    p_search.add_argument("--sort", default="relevance",
+                          choices=["relevance", "hot", "top", "new", "comments"])
+    p_search.add_argument("--time-filter", default="all",
+                          choices=["all", "year", "month", "week", "day", "hour"])
+
     args = parser.parse_args(argv)
     reddit = reddit_client()
 
@@ -69,6 +81,15 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "delete":
         print(json.dumps(reddit_ops.delete_post(reddit, args.url_or_id), indent=2, ensure_ascii=False))
+        return 0
+
+    if args.cmd == "search":
+        results = reddit_ops.search(
+            reddit, args.query,
+            subreddit=args.subreddit, limit=args.limit,
+            sort=args.sort, time_filter=args.time_filter,
+        )
+        print(json.dumps(results, indent=2, ensure_ascii=False))
         return 0
 
     if args.cmd == "post":

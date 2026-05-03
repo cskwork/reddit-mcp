@@ -22,8 +22,8 @@ If credentials missing, the CLI raises with the exact env vars to set. Defaults:
 
 Every Reddit post follows this loop. Don't skip steps.
 
-1. **Discover** — list flairs and read tone of recent posts in the target sub.
-2. **Draft** — write a human-style body, show it to the user, iterate.
+1. **Discover** — list flairs **and** pull the top 5 most-upvoted recent posts on the relevant topic in the target sub.
+2. **Draft** — write a human-style body that matches what you saw in step 1, show it to the user, iterate.
 3. **Dry-run** — confirm flair resolution and length before going live.
 4. **Post** — get explicit user approval, then `create_post`.
 
@@ -31,22 +31,40 @@ Every Reddit post follows this loop. Don't skip steps.
 
 Pick exactly one subreddit. Cross-posting identical content violates Reddit Responsible Builder Policy and the MCP itself blocks it.
 
+#### 1a. Flairs
+
 ```bash
 uv run reddit-post flairs <subreddit>
 ```
 
 If the sub requires flair, you'll see them. If it has none, the CLI says so. Pick a flair that matches the post type (Showcase / Project / Discussion / Help — varies by sub).
 
-Optionally skim the sub's recent top posts to match register:
+#### 1b. Top 5 recent posts on the relevant topic (mandatory)
+
+This grounds your draft in the actual community's conventions, not a generic "human" template. Pick a query that captures the topic of what you're posting (the project's category, not its name — you want comparable posts, not your own past activity).
 
 ```bash
-# via the MCP server, when wired in
-search_reddit(query="*", subreddit="<name>", limit=10)
+uv run reddit-post search "<topic keywords>" \
+  --subreddit <name> --sort top --time-filter month --limit 5
 ```
+
+Read the returned `title`, `selftext`, `score`, and `num_comments`. Extract:
+
+- **Title shape** — sentence case vs Title Case, length, punctuation, emoji use
+- **Opening line** — anecdote vs question vs claim vs spec
+- **Body length** — most subs have a strong norm (short paragraph vs essay)
+- **Formatting density** — bullet/bold use, code block frequency
+- **Disclosure or self-promo style** — how others handle "i made this"
+
+Then make your draft match that register. If the top 5 are all 200-word personal stories, don't ship a 1,500-word feature list. If they're all spec sheets with bullet lists, lean into that. The "lowercase casual" default in step 2 is overridden by what the sub actually rewards.
+
+If you find no relevant top posts (very small sub, narrow topic), drop time_filter to `year` or `all`, or fall back to the default style rules in step 2.
+
+PRAW does not expose Reddit's view counts (mod-only data), so "top" ranks by score (net upvotes), which is the closest proxy.
 
 ### Step 2 — draft (the human-style rules)
 
-The post must read like a person sharing something they built, not a landing page. Hard rules:
+The post must read like a person sharing something they built, not a landing page. Apply what you observed in step 1b — the rules below are defaults, not overrides.
 
 - **Open with a personal moment, not a feature list.** "got tired of jumping between two terminals…" beats "Single skill, three subcommands:". Lead with the pain or the trigger.
 - **Default to lowercase, casual sentences.** Reserve capitals for proper nouns and code identifiers.
