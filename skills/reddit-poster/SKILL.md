@@ -55,7 +55,7 @@ The post must read like a person sharing something they built, not a landing pag
 - **Acknowledge limitations honestly.** Edge cases and known bugs in line, not buried at the bottom.
 - **End with a low-key invitation.** "happy to take questions or feedback" — not "smash that upvote".
 - **Code references inline with backticks.** No code blocks unless the snippet is non-trivial.
-- **Keep title plain.** Reddit titles are immutable post-submit; a typo or extra prefix means delete + repost (which risks spam detection). Triple-check before submitting.
+- **Keep title plain, but capitalize it.** The body is lowercase casual; the **title is not**. Use sentence case at minimum (first letter capital, proper nouns capital, rest natural). Title Case is fine for short titles. All-lowercase titles read as either careless or affected and most subs penalize them. Reddit titles are immutable post-submit; triple-check before submitting.
 
 ### Step 3 — dry-run
 
