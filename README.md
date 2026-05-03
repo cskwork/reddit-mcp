@@ -64,7 +64,25 @@ Add to your MCP config (e.g. `~/.claude.json` `mcpServers`):
 }
 ```
 
-Restart Claude Code. The four tools (`create_post`, `list_flairs`, `get_post`, `search_reddit`) become available.
+Restart Claude Code. Six tools become available: `create_post`, `edit_post`, `delete_post`, `list_flairs`, `get_post`, `search_reddit`.
+
+## Claude Code skill — `reddit-poster`
+
+A bundled skill at [`skills/reddit-poster/SKILL.md`](skills/reddit-poster/SKILL.md) teaches Claude how to use these tools well: discover flairs first, draft in a human (lowercase, story-first) style instead of marketing copy, dry-run before posting, follow Reddit's Responsible Builder Policy on disclosure, and stop for explicit user approval before any irreversible action (post, edit, delete).
+
+Install:
+
+```bash
+# Windows
+mkdir "$env:USERPROFILE\.claude\skills\reddit-poster"
+copy skills\reddit-poster\SKILL.md "$env:USERPROFILE\.claude\skills\reddit-poster\SKILL.md"
+
+# macOS / Linux
+mkdir -p ~/.claude/skills/reddit-poster
+cp skills/reddit-poster/SKILL.md ~/.claude/skills/reddit-poster/SKILL.md
+```
+
+Then restart Claude Code and ask to post on Reddit; the skill loads automatically.
 
 ### `create_post(subreddit, title, body, flair_text=None, is_self=True)`
 
