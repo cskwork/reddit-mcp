@@ -38,6 +38,11 @@ def main(argv: list[str] | None = None) -> int:
     p_get = sub.add_parser("get", help="Fetch a post by URL or ID.")
     p_get.add_argument("url_or_id")
 
+    p_edit = sub.add_parser("edit", help="Edit the body of one of your own self posts.")
+    p_edit.add_argument("url_or_id")
+    p_edit.add_argument("--body")
+    p_edit.add_argument("--body-file")
+
     args = parser.parse_args(argv)
     reddit = reddit_client()
 
@@ -52,6 +57,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "get":
         print(json.dumps(reddit_ops.get_post(reddit, args.url_or_id), indent=2, ensure_ascii=False))
+        return 0
+
+    if args.cmd == "edit":
+        body = _read_body(args.body, args.body_file)
+        print(json.dumps(reddit_ops.edit_post(reddit, args.url_or_id, body), indent=2, ensure_ascii=False))
         return 0
 
     if args.cmd == "post":

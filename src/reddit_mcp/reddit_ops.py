@@ -94,6 +94,28 @@ def create_post(
     }
 
 
+def edit_post(reddit: praw.Reddit, url_or_id: str, new_body: str) -> dict:
+    """Edit the body (selftext) of a self post you own.
+
+    Reddit only allows editing the body of self posts; titles are immutable post-submit.
+    """
+    sub = reddit.submission(url=url_or_id) if "://" in url_or_id else reddit.submission(id=url_or_id)
+    if not sub.is_self:
+        raise ValueError(f"Submission {sub.id} is a link post; only self-post bodies are editable.")
+    try:
+        sub.edit(new_body)
+    except prawcore.exceptions.PrawcoreException as e:
+        raise RuntimeError(f"Reddit API error: {e}") from e
+    sub = reddit.submission(id=sub.id)  # refresh
+    return {
+        "id": sub.id,
+        "url": f"https://www.reddit.com{sub.permalink}",
+        "title": sub.title,
+        "selftext": sub.selftext,
+        "edited": bool(sub.edited),
+    }
+
+
 def get_post(reddit: praw.Reddit, url_or_id: str) -> dict:
     sub = reddit.submission(url=url_or_id) if "://" in url_or_id else reddit.submission(id=url_or_id)
     return {

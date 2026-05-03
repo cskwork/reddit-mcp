@@ -54,6 +54,12 @@ def create_post(
 
 
 @mcp.tool()
+def edit_post(url_or_id: str, new_body: str) -> dict:
+    """Edit the body of one of your own self posts. Title cannot be changed."""
+    return reddit_ops.edit_post(reddit_client(), url_or_id, new_body)
+
+
+@mcp.tool()
 def get_post(url_or_id: str) -> dict:
     """Fetch a single submission by URL or ID."""
     return reddit_ops.get_post(reddit_client(), url_or_id)
